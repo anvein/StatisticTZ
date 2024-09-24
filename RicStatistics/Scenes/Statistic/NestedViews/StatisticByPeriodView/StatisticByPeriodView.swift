@@ -90,6 +90,14 @@ extension StatisticByPeriodView: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate
 
 extension StatisticByPeriodView: UICollectionViewDelegate {
+
+    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        if let cell = collectionView.cellForItem(at: indexPath),
+              cell.isSelected { return false }
+
+        return true
+    }
+
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // TODO: перезагрузить график
         ///

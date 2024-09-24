@@ -6,20 +6,39 @@ final class StatisticCommonTrendView: UIView {
 
     // MARK: - Subviews accessors
 
-    var count: String? {
-        get { countLabel.text }
-        set { countLabel.text = newValue }
+    var countByPeriods: [Int] = [] {
+        didSet {
+            chartView.setDataAndReload(data: countByPeriods)
+        }
     }
 
-//    var trendType: TrendType = .up {
-//        didSet {
-//            arrowImageView.image = (trendType == .up) ? .arrowUpGreen : .arrowDownRed
-//        }
-//    }
+    var count: String? {
+        get { countLabel.text }
+        set {
+            countLabel.text = newValue
+            countLabel.pin.sizeToFit(.widthFlexible)
+        }
+    }
+
+    var trendType: TrendType = .flat {
+        didSet {
+            switch trendType {
+            case .up:
+                arrowImageView.image = .arrowUpGreen
+            case .down:
+                arrowImageView.image = .arrowDownRed
+            case .flat:
+                arrowImageView.image = nil
+            }
+        }
+    }
 
     var text: String? {
         get { textLabel.text }
-        set { textLabel.text = newValue }
+        set {
+            textLabel.text = newValue
+            textLabel.pin.sizeToFit(.width)
+        }
     }
 
     // MARK: - Subviews
@@ -34,7 +53,7 @@ final class StatisticCommonTrendView: UIView {
         return $0
     }(UILabel())
 
-    private let arrowImageView: UIImageView = .init(image: .arrowUpGreen)
+    private let arrowImageView: UIImageView = .init()
 
     private let textLabel: UILabel = {
         $0.font = .gilroyMedium.withSize(15)
@@ -59,6 +78,10 @@ final class StatisticCommonTrendView: UIView {
         calculateFramesOfSubviews()
     }
 
+    func setChartData(countsByPeriods: [Int]) {
+        chartView.setDataAndReload(data: countsByPeriods)
+    }
+
 }
 
 private extension StatisticCommonTrendView {
@@ -73,7 +96,7 @@ private extension StatisticCommonTrendView {
         chartView.pin
             .size(.init(width: 118, height: 56))
             .start()
-            .vCenter()
+            .top()
 
         countLabel.pin
             .top()
@@ -99,3 +122,12 @@ private extension StatisticCommonTrendView {
 
 }
 
+// MARK: - StatisticCommonTrendView.TrendType
+
+extension StatisticCommonTrendView {
+    enum TrendType {
+        case up
+        case down
+        case flat
+    }
+}

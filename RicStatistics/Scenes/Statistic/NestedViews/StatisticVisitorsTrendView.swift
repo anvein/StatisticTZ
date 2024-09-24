@@ -3,6 +3,7 @@ import UIKit
 
 final class StatisticVisitorsTrendView: UIView {
 
+
     // MARK: - Subviews
 
     private let titleLabel: UILabel = {
@@ -19,8 +20,8 @@ final class StatisticVisitorsTrendView: UIView {
     }(UIView())
 
     private let trendView: StatisticCommonTrendView = {
-        $0.count = "1356"
-        $0.text = "Количество посетителей в этом месяце выросло"
+        $0.count = "-"
+        $0.text = "Количество посетителей в этом месяце неизвестно"
         return $0
     }(StatisticCommonTrendView())
 
@@ -37,6 +38,20 @@ final class StatisticVisitorsTrendView: UIView {
         super.layoutSubviews()
 
         calculateFramesOfSubviews()
+    }
+
+    // MARK: - Update view
+
+    func fillVisitorsTrend(
+        visitorsCountsByMonths: [Int],
+        count: String,
+        trendType: StatisticCommonTrendView.TrendType,
+        text: String
+    ) {
+        trendView.setChartData(countsByPeriods: visitorsCountsByMonths)
+        trendView.count = count
+        trendView.trendType = trendType
+        trendView.text = text
     }
 
 }
@@ -71,4 +86,5 @@ private extension StatisticVisitorsTrendView {
     }
 
 }
+
 

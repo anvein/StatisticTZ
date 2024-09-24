@@ -7,10 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		362A80D62CA0926400B25DEC /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 362A80D52CA0926400B25DEC /* DGCharts */; };
+		3615FA642CA2FE2E00D087A4 /* DGCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 3615FA632CA2FE2E00D087A4 /* DGCharts */; };
+		3615FA672CA2FFC000D087A4 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 3615FA662CA2FFC000D087A4 /* RealmSwift */; };
+		3615FA852CA3411000D087A4 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 3615FA842CA3411000D087A4 /* RxCocoa */; };
+		3615FA872CA3411000D087A4 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 3615FA862CA3411000D087A4 /* RxSwift */; };
 		369439BD2CA1E0BC0095C7F5 /* .gitignore in Sources */ = {isa = PBXBuildFile; fileRef = 369439BC2CA1E0B70095C7F5 /* .gitignore */; };
 		36EAA4B82C99CCD800EBB0D4 /* PinLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 36EAA4B72C99CCD800EBB0D4 /* PinLayout */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3615FA822CA3305A00D087A4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		365D8AD62C99B45000DF74A2 /* RicStatistics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RicStatistics.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -43,7 +59,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				362A80D62CA0926400B25DEC /* DGCharts in Frameworks */,
+				3615FA672CA2FFC000D087A4 /* RealmSwift in Frameworks */,
+				3615FA642CA2FE2E00D087A4 /* DGCharts in Frameworks */,
+				3615FA872CA3411000D087A4 /* RxSwift in Frameworks */,
+				3615FA852CA3411000D087A4 /* RxCocoa in Frameworks */,
 				36EAA4B82C99CCD800EBB0D4 /* PinLayout in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -51,11 +70,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3615FA7E2CA3305A00D087A4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		365D8ACD2C99B45000DF74A2 = {
 			isa = PBXGroup;
 			children = (
 				369439BC2CA1E0B70095C7F5 /* .gitignore */,
 				365D8AD82C99B45000DF74A2 /* RicStatistics */,
+				3615FA7E2CA3305A00D087A4 /* Frameworks */,
 				365D8AD72C99B45000DF74A2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -78,6 +105,7 @@
 				365D8AD22C99B45000DF74A2 /* Sources */,
 				365D8AD32C99B45000DF74A2 /* Frameworks */,
 				365D8AD42C99B45000DF74A2 /* Resources */,
+				3615FA822CA3305A00D087A4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -89,7 +117,10 @@
 			name = RicStatistics;
 			packageProductDependencies = (
 				36EAA4B72C99CCD800EBB0D4 /* PinLayout */,
-				362A80D52CA0926400B25DEC /* DGCharts */,
+				3615FA632CA2FE2E00D087A4 /* DGCharts */,
+				3615FA662CA2FFC000D087A4 /* RealmSwift */,
+				3615FA842CA3411000D087A4 /* RxCocoa */,
+				3615FA862CA3411000D087A4 /* RxSwift */,
 			);
 			productName = RicStatistics;
 			productReference = 365D8AD62C99B45000DF74A2 /* RicStatistics.app */;
@@ -121,7 +152,9 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				36EAA4B62C99CCD800EBB0D4 /* XCRemoteSwiftPackageReference "PinLayout" */,
-				362A80D42CA0926400B25DEC /* XCRemoteSwiftPackageReference "Charts" */,
+				3615FA622CA2FE2E00D087A4 /* XCRemoteSwiftPackageReference "Charts" */,
+				3615FA652CA2FFC000D087A4 /* XCRemoteSwiftPackageReference "realm-swift" */,
+				3615FA832CA3411000D087A4 /* XCRemoteSwiftPackageReference "RxSwift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 365D8AD72C99B45000DF74A2 /* Products */;
@@ -354,12 +387,28 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		362A80D42CA0926400B25DEC /* XCRemoteSwiftPackageReference "Charts" */ = {
+		3615FA622CA2FE2E00D087A4 /* XCRemoteSwiftPackageReference "Charts" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ChartsOrg/Charts";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 5.1.0;
+			};
+		};
+		3615FA652CA2FFC000D087A4 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		3615FA832CA3411000D087A4 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.7.1;
 			};
 		};
 		36EAA4B62C99CCD800EBB0D4 /* XCRemoteSwiftPackageReference "PinLayout" */ = {
@@ -373,10 +422,25 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		362A80D52CA0926400B25DEC /* DGCharts */ = {
+		3615FA632CA2FE2E00D087A4 /* DGCharts */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 362A80D42CA0926400B25DEC /* XCRemoteSwiftPackageReference "Charts" */;
+			package = 3615FA622CA2FE2E00D087A4 /* XCRemoteSwiftPackageReference "Charts" */;
 			productName = DGCharts;
+		};
+		3615FA662CA2FFC000D087A4 /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3615FA652CA2FFC000D087A4 /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
+		};
+		3615FA842CA3411000D087A4 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3615FA832CA3411000D087A4 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		3615FA862CA3411000D087A4 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3615FA832CA3411000D087A4 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
 		};
 		36EAA4B72C99CCD800EBB0D4 /* PinLayout */ = {
 			isa = XCSwiftPackageProductDependency;

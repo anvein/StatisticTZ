@@ -18,8 +18,8 @@ final class StatisticObserversTrendsView: UIView {
     }(UIView())
 
     private let newObserversView: StatisticCommonTrendView = {
-//        $0.trendType = .up
-        $0.count = "1356"
+        $0.trendType = .up
+        $0.count = "-"
         $0.text = "Новые наблюдатели в этом месяце" // TODO: lang
         return $0
     }(StatisticCommonTrendView())
@@ -30,8 +30,8 @@ final class StatisticObserversTrendsView: UIView {
     }(UIView())
 
     private let lostObserversView: StatisticCommonTrendView = {
-//        $0.trendType = .down
-        $0.count = "10"
+        $0.trendType = .down
+        $0.count = "-"
         $0.text = "Пользователей перестали за Вами наблюдать" // TODO: lang
         return $0
     }(StatisticCommonTrendView())
@@ -48,6 +48,18 @@ final class StatisticObserversTrendsView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         calculateFramesOfSubviews()
+    }
+
+    // MARK: - Update view
+
+    func fillNewObserversTrendView(countsByMonths: [Int], count: String) {
+        newObserversView.setChartData(countsByPeriods: countsByMonths)
+        newObserversView.count = count
+    }
+
+    func fillLostObserversTrendView(countsByMonths: [Int], count: String) {
+        lostObserversView.setChartData(countsByPeriods: countsByMonths)
+        lostObserversView.count = count
     }
 
 }

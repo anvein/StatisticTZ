@@ -21,16 +21,6 @@ final class StatisticCustomView: UIView {
             $0.alwaysBounceVertical = true
         }
 
-        PIXEL_PERFECT_screen.addSliderForNextInstance(.init(
-            title: "scrollView.offset",
-            initialValue: 10,
-            minValue: -50,
-            maxValue: 100,
-            handler: { [weak self] sliderValue in
-                self?.scrollView.contentOffset.y = 780
-            })
-        )
-
         return $0
     }(UIScrollView())
 
@@ -45,11 +35,11 @@ final class StatisticCustomView: UIView {
         return $0
     }(UILabel())
 
-    private let visitorsTrendView: StatisticVisitorsTrendView = .init()
+    let visitorsTrendView: StatisticVisitorsTrendView = .init()
     private let byPeriodView: StatisticByPeriodView = .init()
     private let topVisitorsProfilesView: StatisticTopVisitorsProfilesView = .init()
     private let byGenderAndAgeView: StatisticByGenderAndAgeView = .init()
-    private let observersTrendsView: StatisticObserversTrendsView = .init()
+    let observersTrendsView: StatisticObserversTrendsView = .init()
 
     // MARK: - Init
 
@@ -66,10 +56,20 @@ final class StatisticCustomView: UIView {
         calculateFramesOfSubviews()
     }
 
-    // MARK: - Update view
+    // MARK: - Setup (internal)
 
     func addHandlerForRefreshControl(target: Any, _ action: Selector) {
         refreshControl.addTarget(target, action: action, for: .valueChanged)
+    }
+
+    // MARK: - Update view
+
+    func setIsLoadingRefreshControl(_ isLoading: Bool) {
+        if isLoading {
+            refreshControl.beginRefreshing()
+        } else {
+            refreshControl.endRefreshing()
+        }
     }
 }
 

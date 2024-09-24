@@ -11,7 +11,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let window = UIWindow(windowScene: windowScene)
 
-        let mainStatisticVC = StatisticViewController()
+        let mainStatisticVC = ScreensAssembler().assemblyStatisticScreen()
 
         window.rootViewController = mainStatisticVC
         window.makeKeyAndVisible()

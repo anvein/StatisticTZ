@@ -13,16 +13,13 @@ final class StatisticLineSimpleTrendChartView: LineChartView {
     convenience init() {
         self.init(frame: .zero)
         setup()
-
-        // TODO: временная генерация данных
-        setDataAndReload(data: [3, 8, 2, 12, 8, 16], animate: false)
     }
 
     // MARK: - Update view (internal)
 
-    func setDataAndReload(data: [Int], animate: Bool) {
+    func setDataAndReload(data: [Int]) {
         chartData = data
-        reloadChart(withAnimate: animate)
+        reloadChart()
     }
 
 }
@@ -32,6 +29,9 @@ private extension StatisticLineSimpleTrendChartView {
     // MARK: - Setup
 
     func setup() {
+        noDataText = "Нет данных"
+        noDataFont = .gilroyMedium.withSize(12)
+
         setScaleEnabled(false)
         chartDescription.enabled = false
         legend.enabled = false
@@ -50,7 +50,7 @@ private extension StatisticLineSimpleTrendChartView {
         rightAxis.enabled = false
     }
 
-    func reloadChart(withAnimate: Bool) {
+    func reloadChart() {
         let entries = buildChartDataEntry()
         let trendType = calculateTrendType()
 
