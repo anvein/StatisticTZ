@@ -10,7 +10,7 @@ final class StatisticsModel {
     private let defaultsManager: UserDefaultsManager
     private let networkService: NetworkService
     private let realmManager: RealmManager
-    private let dateStatisticService: DateStatisticsService
+    private let statisticCalcService: StatisticCalculatorService
 
     // MARK: - State
 
@@ -52,37 +52,45 @@ final class StatisticsModel {
         defaultsManager: UserDefaultsManager = .shared,
         networkService: NetworkService = .shared,
         realmManager: RealmManager = .shared,
-        dateStatisticService: DateStatisticsService = .init()
+        statisticCalcService: StatisticCalculatorService = .init()
     ) {
         self.defaultsManager = defaultsManager
         self.networkService = networkService
         self.realmManager = realmManager
-        self.dateStatisticService = dateStatisticService
+        self.statisticCalcService = statisticCalcService
     }
 
     // MARK: - Load data
 
     func loadData(forceReload: Bool = false) async {
         if !defaultsManager.isStatisticLoaded || forceReload {
-            async let usersResponse = networkService.getUsers()
-            async let statisticsResponse = networkService.getStatistics()
+            do {
+                async let usersResponse = networkService.getUsers()
+                async let statisticsResponse = networkService.getStatistics()
 
-            let responses = await (usersResponse: try! usersResponse, statisticsResponse: try! statisticsResponse)
+                let responses = await (
+                    usersResponse: try usersResponse,
+                    statisticsResponse: try statisticsResponse
+                )
 
-            Task { @MainActor [weak self, defaultsManager] in
-                guard let self else { return }
+                Task { @MainActor [weak self, defaultsManager] in
+                    guard let self else { return }
 
-                try? self.removeDataInRealm()
+                    try self.removeDataInRealm()
 
-                try? self.saveUsersWithFilesToRealmFrom(responses.usersResponse)
+                    try self.saveUsersWithFilesToRealmFrom(responses.usersResponse)
 
-                let usersIds = responses.statisticsResponse.getUsersIds()
-                let rlmUsers = realmManager.getUsersBy(ids: usersIds)
+                    let usersIds = responses.statisticsResponse.getUsersIds()
+                    let rlmUsers = realmManager.getUsersBy(ids: usersIds)
 
-                try? self.saveStatisticsToRealmFrom(responses.statisticsResponse, with: rlmUsers)
+                    try self.saveStatisticsToRealmFrom(responses.statisticsResponse, with: rlmUsers)
 
-                self.loadDataFromRealm()
-                defaultsManager.isStatisticLoaded = true
+                    self.loadDataFromRealm()
+                    defaultsManager.isStatisticLoaded = true
+                }
+            } catch {
+                // TODO: показать алерт
+                print("Ошибка - \(error.localizedDescription)")
             }
         } else {
             Task { @MainActor [weak self] in
@@ -120,11 +128,11 @@ final class StatisticsModel {
         let items = Array(rlmStatistics.filter { $0.type == .view })
         let allDates = items.flatMap { $0.dates }
 
-        let countByMonths = dateStatisticService.calculateDatesCountByMonths(fromDates: allDates, countMonth: 6)
+        let countByMonths = statisticCalcService.calculateDatesCountByMonths(fromDates: allDates, countMonth: 6)
         var countByMonthsFlat = countByMonths.map { $0.count }
         countByMonthsFlat = countByMonthsFlat.reversed()
 
-        let trendType = dateStatisticService.calculateTrendTypeFor(countByMonthsFlat)
+        let trendType = statisticCalcService.calculateTrendTypeFor(countByMonthsFlat)
         let countInCurrentMonth = countByMonthsFlat.last ?? 0
 
         return .init(
@@ -140,8 +148,8 @@ final class StatisticsModel {
     ) -> ObserversTrendModelDto {
         let items = Array(rlmStatistics.filter { $0.type == itemType })
         let allDates = items.flatMap { $0.dates }
-
-        let countByMonths = dateStatisticService.calculateDatesCountByMonths(fromDates: allDates, countMonth: 6)
+        
+        let countByMonths = statisticCalcService.calculateDatesCountByMonths(fromDates: allDates, countMonth: 6)
         var countByMonthsFlat = countByMonths.map { $0.count }
         countByMonthsFlat = countByMonthsFlat.reversed()
 
@@ -194,7 +202,6 @@ final class StatisticsModel {
         )
     }
 
-
     func countDatesEqualToDate(from dates: [Date], date: Date) -> Int {
         let calendar = Calendar.current
         return dates.filter {
@@ -216,10 +223,7 @@ final class StatisticsModel {
                 guard let periodDay else { continue }
 
                 let count = countDatesEqualToDate(from: sortedDates, date: periodDay)
-
                 groupedDates.append(CountByPeriodModelDto(value: count, day: periodDay))
-
-
 
             case .byWeek:
                 break

@@ -1,7 +1,7 @@
 
 import Foundation
 
-final class DateStatisticsService {
+final class StatisticCalculatorService {
 
     /// Key (String) - дата в виде "mmYY"
     /// Value (Int) - количество в указанный месяц
@@ -15,7 +15,6 @@ final class DateStatisticsService {
     func calculateDatesCountByMonths(fromDates dates: [Date], countMonth: Int) -> [CountsByMonts] {
         let currentDate = Date()
         let calendar = Calendar.current
-
         var countByMonth: [CountsByMonts] = []
 
         for iMonth in 1...countMonth {
@@ -33,7 +32,7 @@ final class DateStatisticsService {
 
             let monthKey = dateFormatter.string(from: monthStart)
             let count = dates.filter {
-                return $0 > monthStart && $0 <= monthEnd
+                return $0 >= monthStart && $0 <= monthEnd
             }.count
 
             countByMonth.append((month: monthKey, count: count))

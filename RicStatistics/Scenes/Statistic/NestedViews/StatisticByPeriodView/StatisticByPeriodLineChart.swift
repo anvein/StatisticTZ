@@ -44,6 +44,7 @@ private extension StatisticByPeriodLineChart {
         backgroundColor = .Common.screenSectionBg
         cornerRadius = 16
 
+        doubleTapToZoomEnabled = false
         scaleYEnabled = false
         scaleXEnabled = true
 

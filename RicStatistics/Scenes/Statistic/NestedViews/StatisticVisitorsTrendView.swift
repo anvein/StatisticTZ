@@ -3,7 +3,6 @@ import UIKit
 
 final class StatisticVisitorsTrendView: UIView {
 
-
     // MARK: - Subviews
 
     private let titleLabel: UILabel = {
@@ -21,7 +20,7 @@ final class StatisticVisitorsTrendView: UIView {
 
     private let trendView: StatisticCommonTrendView = {
         $0.count = "-"
-        $0.text = "Количество посетителей в этом месяце ..."
+        $0.text = "Количество посетителей в этом месяце вычисляется"
         return $0
     }(StatisticCommonTrendView())
 
@@ -54,6 +53,7 @@ final class StatisticVisitorsTrendView: UIView {
         )
         trendView.count = count
         trendView.text = text
+        trendView.trendType = trendType
     }
 
 }

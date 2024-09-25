@@ -39,16 +39,15 @@ class StatisticViewController: UIViewController {
         setupBindingsWithViews()
 
         Task { [model] in
-            await model.loadData()
+            await model.loadData(forceReload: true)
         }
 
-
-        PIXEL_PERFECT_screen.createAndSetupInstance(
-            baseView: self.view,
-            imageName: "PIXEL_PERFECT_main",
-            controlsBottomSideOffset: 0,
-            imageScaleFactor: 3
-        )
+//        PIXEL_PERFECT_screen.createAndSetupInstance(
+//            baseView: self.view,
+//            imageName: "PIXEL_PERFECT_main",
+//            controlsBottomSideOffset: 0,
+//            imageScaleFactor: 3
+//        )
     }
 
 }
@@ -75,6 +74,14 @@ private extension StatisticViewController {
             })
             .disposed(by: disposeBag)
 
+
+        model.visitorsTrendSubjectObservable
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] visitorsTrend in
+                self?.fillVisitorsTrendView(visitorsTrend)
+            })
+            .disposed(by: disposeBag)
+
         model.topVisitorsObservable
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] users in
@@ -86,13 +93,6 @@ private extension StatisticViewController {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] visitorsByPeriods in
                 self?.fillVisitorsByPeriodsView(visitorsByPeriods)
-            })
-            .disposed(by: disposeBag)
-
-        model.visitorsTrendSubjectObservable
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] visitorsTrend in
-                self?.fillVisitorsTrendView(visitorsTrend)
             })
             .disposed(by: disposeBag)
 

@@ -102,26 +102,31 @@ private extension StatisticCustomView {
             .below(of: titleLabel)
             .marginTop(38)
             .horizontally(16)
+        visitorsTrendView.layoutIfNeeded()
 
         visitorsByPeriodView.pin
             .below(of: visitorsTrendView)
             .marginTop(28)
             .horizontally()
+        visitorsByPeriodView.layoutIfNeeded()
 
         topVisitorsProfilesView.pin
             .below(of: visitorsByPeriodView)
             .marginTop(32)
             .horizontally(16)
+        topVisitorsProfilesView.layoutIfNeeded()
 
         byGenderAndAgeView.pin
             .below(of: topVisitorsProfilesView)
             .marginTop(32)
             .horizontally()
+        byGenderAndAgeView.layoutIfNeeded()
 
         observersTrendsView.pin
             .below(of: byGenderAndAgeView)
             .marginTop(32)
             .horizontally(16)
+        observersTrendsView.layoutIfNeeded()
 
         contentContainerView.pin.wrapContent(.vertically, padding: .init(top: 48, left: 0, bottom: 32, right: 0))
         scrollView.contentSize = contentContainerView.frame.size

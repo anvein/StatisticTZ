@@ -35,10 +35,13 @@ private extension StatisticLineSimpleTrendChartView {
         noDataFont = .gilroyMedium.withSize(12)
 
         setScaleEnabled(false)
-        chartDescription.enabled = false
-        legend.enabled = false
+        doubleTapToZoomEnabled = false
+
         highlightPerDragEnabled = false
         highlightPerTapEnabled = false
+
+        chartDescription.enabled = false
+        legend.enabled = false
 
         leftAxis.drawGridLinesEnabled = false
         rightAxis.drawGridLinesEnabled = false

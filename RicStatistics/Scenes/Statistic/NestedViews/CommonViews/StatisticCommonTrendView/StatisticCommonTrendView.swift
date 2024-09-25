@@ -1,6 +1,5 @@
 
 import UIKit
-import DGCharts
 
 final class StatisticCommonTrendView: UIView {
 
@@ -29,14 +28,14 @@ final class StatisticCommonTrendView: UIView {
         }
     }
 
-    var trendType: TrendType = .flat {
+    var trendType: StatisticLineSimpleTrendChartView.TrendType? {
         didSet {
             switch trendType {
             case .up:
                 arrowImageView.image = .arrowUpGreen
             case .down:
                 arrowImageView.image = .arrowDownRed
-            case .flat:
+            case .none:
                 arrowImageView.image = nil
             }
         }
@@ -101,7 +100,6 @@ private extension StatisticCommonTrendView {
         chartView.pin
             .size(.init(width: 118, height: 56))
             .start()
-            .top()
 
         countLabel.pin
             .top()
@@ -123,6 +121,7 @@ private extension StatisticCommonTrendView {
             .sizeToFit(.width)
 
         self.pin.height(textLabel.frame.maxY)
+        chartView.pin.vCenter()
     }
 
 }
