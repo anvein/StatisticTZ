@@ -1,6 +1,7 @@
 
 import UIKit
 import PinLayout
+import StatisticBusinessLogic
 
 final class HorizontalMenuButtonCollectionViewCell: UICollectionViewCell {
 

@@ -1,6 +1,7 @@
 
 import DGCharts
 import UIKit
+import StatisticBusinessLogic
 
 final class StatisticAgeHorizontalBarChart: HorizontalBarChartView {
 

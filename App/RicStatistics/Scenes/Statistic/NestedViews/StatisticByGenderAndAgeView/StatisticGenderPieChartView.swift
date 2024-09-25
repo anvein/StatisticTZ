@@ -1,6 +1,7 @@
 
 import UIKit
 import DGCharts
+import StatisticBusinessLogic
 
 final class StatisticGenderPieChartView: PieChartView {
 
@@ -95,8 +96,9 @@ private extension StatisticGenderPieChartView {
             let legendEntry = LegendEntry(label: "\(categoryItem.gender.title)  \(categoryPercent)%")
             legendEntry.form = .circle
             legendEntry.formSize = 10
-            legendEntry.formColor = categoryItem.gender.color
+            legendEntry.formColor = categoryItem.gender == .male ? .Charts.red : .Charts.orange
             legendEntry.labelColor = .black
+            
             return legendEntry
         }
 

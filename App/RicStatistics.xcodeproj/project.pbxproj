@@ -11,10 +11,22 @@
 		3615FA672CA2FFC000D087A4 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 3615FA662CA2FFC000D087A4 /* RealmSwift */; };
 		3615FA852CA3411000D087A4 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 3615FA842CA3411000D087A4 /* RxCocoa */; };
 		3615FA872CA3411000D087A4 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 3615FA862CA3411000D087A4 /* RxSwift */; };
+		36824C382CA4B90F00C3A821 /* StatisticBusinessLogic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36824C362CA4B8AB00C3A821 /* StatisticBusinessLogic.framework */; };
+		36824C392CA4B90F00C3A821 /* StatisticBusinessLogic.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 36824C362CA4B8AB00C3A821 /* StatisticBusinessLogic.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		369439BD2CA1E0BC0095C7F5 /* .gitignore in Sources */ = {isa = PBXBuildFile; fileRef = 369439BC2CA1E0B70095C7F5 /* .gitignore */; };
 		36EAA4B82C99CCD800EBB0D4 /* PinLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 36EAA4B72C99CCD800EBB0D4 /* PinLayout */; };
 		36EEB84E2CA38F24007CFCED /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 3615FA662CA2FFC000D087A4 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		36824C352CA4B8AB00C3A821 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 36824B752CA4B75F00C3A821 /* StatisticBusinessLogic.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 36824A542CA4B3B300C3A821;
+			remoteInfo = StatisticBusinessLogic;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		3615FA822CA3305A00D087A4 /* Embed Frameworks */ = {
@@ -23,6 +35,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				36824C392CA4B90F00C3A821 /* StatisticBusinessLogic.framework in Embed Frameworks */,
 				36EEB84E2CA38F24007CFCED /* RealmSwift in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -32,6 +45,7 @@
 
 /* Begin PBXFileReference section */
 		365D8AD62C99B45000DF74A2 /* RicStatistics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RicStatistics.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		36824B752CA4B75F00C3A821 /* StatisticBusinessLogic.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = StatisticBusinessLogic.xcodeproj; path = ../StatisticBusinessLogic/StatisticBusinessLogic.xcodeproj; sourceTree = "<group>"; };
 		369439BC2CA1E0B70095C7F5 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -61,6 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36824C382CA4B90F00C3A821 /* StatisticBusinessLogic.framework in Frameworks */,
 				3615FA672CA2FFC000D087A4 /* RealmSwift in Frameworks */,
 				3615FA642CA2FE2E00D087A4 /* DGCharts in Frameworks */,
 				3615FA872CA3411000D087A4 /* RxSwift in Frameworks */,
@@ -75,6 +90,7 @@
 		3615FA7E2CA3305A00D087A4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				36824B752CA4B75F00C3A821 /* StatisticBusinessLogic.xcodeproj */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -93,6 +109,14 @@
 			isa = PBXGroup;
 			children = (
 				365D8AD62C99B45000DF74A2 /* RicStatistics.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		36824B762CA4B75F00C3A821 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				36824C362CA4B8AB00C3A821 /* StatisticBusinessLogic.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -161,12 +185,28 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 365D8AD72C99B45000DF74A2 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 36824B762CA4B75F00C3A821 /* Products */;
+					ProjectRef = 36824B752CA4B75F00C3A821 /* StatisticBusinessLogic.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				365D8AD52C99B45000DF74A2 /* RicStatistics */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		36824C362CA4B8AB00C3A821 /* StatisticBusinessLogic.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = StatisticBusinessLogic.framework;
+			remoteRef = 36824C352CA4B8AB00C3A821 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		365D8AD42C99B45000DF74A2 /* Resources */ = {
@@ -212,6 +252,10 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nova.RicStatisticsTZ;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -240,6 +284,10 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nova.RicStatisticsTZ;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

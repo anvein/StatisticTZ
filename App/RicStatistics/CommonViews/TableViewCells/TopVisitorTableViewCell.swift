@@ -1,5 +1,6 @@
 
 import UIKit
+import StatisticBusinessLogic
 
 final class TopVisitorTableViewCell: UITableViewCell {
 

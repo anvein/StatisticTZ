@@ -2,6 +2,7 @@
 import UIKit
 import RxSwift
 import DGCharts
+import StatisticBusinessLogic
 
 final class StatisticVisitorsByPeriodView: UIView {
 

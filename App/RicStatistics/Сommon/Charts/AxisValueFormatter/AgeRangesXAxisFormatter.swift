@@ -1,5 +1,6 @@
 
 import DGCharts
+import StatisticBusinessLogic
 
 final class AgeRangesXAxisFormatter: IndexAxisValueFormatter {
 
