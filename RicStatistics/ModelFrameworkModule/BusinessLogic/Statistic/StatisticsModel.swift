@@ -5,37 +5,46 @@ import RxSwift
 
 final class StatisticsModel {
 
-    typealias VisitorsTrendData = (visitorsByMonth: [Int], trend: Int)
-
-    // MARK: - Data / Bindings
-
-    private let topUsersSubject = BehaviorSubject<[RLMUser]>(value: [])
-    var topVisitorsObservable: Observable<[RLMUser]> { return topUsersSubject.asObservable() }
-
-    private let isLoadingSubject: BehaviorSubject<Bool> = .init(value: false)
-    var isLoadingObservable: Observable<Bool> { return isLoadingSubject.asObservable() }
-
-    private let visitorsTrendSubject = BehaviorSubject<StatisticTrendModelDto>(value: .init())
-    var visitorsTrendSubjectObservable: Observable<StatisticTrendModelDto> {
-        return visitorsTrendSubject.asObservable()
-    }
-
-    private let subscriptionsTrendSubject = BehaviorSubject<StatisticTrendModelDto>(value: .init())
-    var subscriptionsTrendSubjectObservable: Observable<StatisticTrendModelDto> {
-        return subscriptionsTrendSubject.asObservable()
-    }
-
-    private let unsubscriptionsTrendSubject = BehaviorSubject<StatisticTrendModelDto>(value: .init())
-    var unsubscriptionsTrendSubjectObservable: Observable<StatisticTrendModelDto> {
-        return unsubscriptionsTrendSubject.asObservable()
-    }
-
     // MARK: - Services
 
     private let defaultsManager: UserDefaultsManager
     private let networkService: NetworkService
     private let realmManager: RealmManager
     private let dateStatisticService: DateStatisticsService
+
+    // MARK: - State
+
+    var visitorsByPeriodFilter: VisitorsStatisticPeriod = .byDay
+
+    // MARK: - Data / Bindings
+
+    private let isLoadingSubject: BehaviorSubject<Bool> = .init(value: false)
+    var isLoadingObservable: Observable<Bool> { return isLoadingSubject.asObservable() }
+
+    private let visitorsByPeriodsSubject = BehaviorSubject<VisitorsByPeriodsModelDto>(
+        value: .init(countByPeriods: [], period: .byDay)
+    )
+    var visitorsByPeriodsObservable: Observable<VisitorsByPeriodsModelDto> {
+        return visitorsByPeriodsSubject.asObservable()
+    }
+
+    private let visitorsTrendSubject = BehaviorSubject<VisitorsTrendModelDto>(value: .init())
+    var visitorsTrendSubjectObservable: Observable<VisitorsTrendModelDto> {
+        return visitorsTrendSubject.asObservable()
+    }
+
+    private let topVisitorsSubject = BehaviorSubject<[TopVisitorModelDto]>(value: [])
+    var topVisitorsObservable: Observable<[TopVisitorModelDto]> { return topVisitorsSubject.asObservable() }
+
+    private let subscriptionsTrendSubject = BehaviorSubject<ObserversTrendModelDto>(value: .init())
+    var subscriptionsTrendSubjectObservable: Observable<ObserversTrendModelDto> {
+        return subscriptionsTrendSubject.asObservable()
+    }
+
+    private let unsubscriptionsTrendSubject = BehaviorSubject<ObserversTrendModelDto>(value: .init())
+    var unsubscriptionsTrendSubjectObservable: Observable<ObserversTrendModelDto> {
+        return unsubscriptionsTrendSubject.asObservable()
+    }
 
     // MARK: - Init
 
@@ -72,8 +81,8 @@ final class StatisticsModel {
 
                 try? self.saveStatisticsToRealmFrom(responses.statisticsResponse, with: rlmUsers)
 
-                defaultsManager.isStatisticLoaded = true
                 self.loadDataFromRealm()
+                defaultsManager.isStatisticLoaded = true
             }
         } else {
             Task { @MainActor [weak self] in
@@ -82,48 +91,177 @@ final class StatisticsModel {
         }
     }
 
+    func reloadVisitorsByPeriodsData() {
+        let rlmStatistics = realmManager.getObjects(RLMStatisticItem.self)
+        let visitorsByPeriods = calculateVisitorsByPeriod(rlmStatistics)
+        visitorsByPeriodsSubject.onNext(visitorsByPeriods)
+    }
+
     private func loadDataFromRealm() {
         let rlmStatistics = realmManager.getObjects(RLMStatisticItem.self)
 
-        let usersIds = Array(rlmStatistics).compactMap { $0.user?.id }
-        let rlmUsers = realmManager.getUsersBy(ids: usersIds)
-
-        let visitorsTrendResult = calculateVisisorsTrendResult(from: rlmStatistics, for: .view)
-        let subscriptionsTrendResult = calculateVisisorsTrendResult(from: rlmStatistics, for: .subscription)
-        let unsubscriptionsTrendResult = calculateVisisorsTrendResult(from: rlmStatistics, for: .unsubscription)
+        let visitorsTrendResult = calculateVisisorsTrendResult(from: rlmStatistics)
+        let subscriptionsTrendResult = calculateObserversTrendResult(from: rlmStatistics, for: .subscription)
+        let unsubscriptionsTrendResult = calculateObserversTrendResult(from: rlmStatistics, for: .unsubscription)
+        let topVisitorsResult = calculateTopVisitors(rlmStatistics: rlmStatistics)
+        let visitorsByPeriods = calculateVisitorsByPeriod(rlmStatistics)
 
         visitorsTrendSubject.onNext(visitorsTrendResult)
+        visitorsByPeriodsSubject.onNext(visitorsByPeriods)
         subscriptionsTrendSubject.onNext(subscriptionsTrendResult)
         unsubscriptionsTrendSubject.onNext(unsubscriptionsTrendResult)
-        topUsersSubject.onNext(Array(rlmUsers))
+        topVisitorsSubject.onNext(topVisitorsResult)
         isLoadingSubject.onNext(false)
     }
 
-    // MARK: - PrepareData for Result DTO
+    // MARK: - Calculate Result
 
-    func calculateVisisorsTrendResult(
-        from rlmStatistics: Results<RLMStatisticItem>,
-        for itemType: RLMStatisticItemType
-    ) -> StatisticTrendModelDto {
-        let items = Array(rlmStatistics.filter { $0.type == itemType })
+    func calculateVisisorsTrendResult(from rlmStatistics: Results<RLMStatisticItem>) -> VisitorsTrendModelDto {
+        let items = Array(rlmStatistics.filter { $0.type == .view })
         let allDates = items.flatMap { $0.dates }
 
-        let countByMonths = dateStatisticService.calculateDatesCountByMonts(fromDates: allDates, countMonth: 6)
-        let countByMonthsFlat = countByMonths.map { $0.count }
-        let delta = dateStatisticService.calculateDeltaForLastMonth(countsByMonths: countByMonths)
+        let countByMonths = dateStatisticService.calculateDatesCountByMonths(fromDates: allDates, countMonth: 6)
+        var countByMonthsFlat = countByMonths.map { $0.count }
+        countByMonthsFlat = countByMonthsFlat.reversed()
 
-        var trendType: TrendType? = nil
-        if let delta {
-            trendType = dateStatisticService.calculateTrendTypeFor(delta: delta)
-        }
+        let trendType = dateStatisticService.calculateTrendTypeFor(countByMonthsFlat)
+        let countInCurrentMonth = countByMonthsFlat.last ?? 0
 
         return .init(
-            countByPeriod: countByMonthsFlat,
+            countByPeriods: countByMonthsFlat,
             trendType: trendType ?? .flat,
-            delta: delta ?? 0
+            countInCurrentMonth: countInCurrentMonth
         )
     }
 
+    func calculateObserversTrendResult(
+        from rlmStatistics: Results<RLMStatisticItem>,
+        for itemType: RLMStatisticItemType
+    ) -> ObserversTrendModelDto {
+        let items = Array(rlmStatistics.filter { $0.type == itemType })
+        let allDates = items.flatMap { $0.dates }
+
+        let countByMonths = dateStatisticService.calculateDatesCountByMonths(fromDates: allDates, countMonth: 6)
+        var countByMonthsFlat = countByMonths.map { $0.count }
+        countByMonthsFlat = countByMonthsFlat.reversed()
+
+        let lastMonthCount = countByMonthsFlat.last ?? 0
+
+        return .init(
+            countByPeriods: countByMonthsFlat,
+            countInCurrentPeriod: lastMonthCount
+        )
+    }
+
+    func calculateTopVisitors(
+        rlmStatistics: Results<RLMStatisticItem>
+    ) -> [TopVisitorModelDto] {
+        let viewStatisticItems = rlmStatistics
+            .filter("\(RLMStatisticItem.keyTypeRawValue) == '\(RLMStatisticItemType.view.rawValue)'")
+
+        var userCountViews: [Int: Int] = [:]
+        for item in viewStatisticItems {
+            guard let userId = item.user?.id else { continue }
+
+            userCountViews[userId, default: 0] += item.dates.count
+        }
+        let topUsersIdsSortedByCount = userCountViews.sorted(by: { $0 > $1 }).prefix(3)
+        let topUsersIdsFlat = topUsersIdsSortedByCount.map { $0.key }
+
+        let topUsers = realmManager.getUsersBy(ids: topUsersIdsFlat)
+        let topUsersSortedByCount = topUsersIdsFlat.compactMap { id in
+            topUsers.first(where: { $0.id == id })
+        }
+
+        let topVisitorsArray: [TopVisitorModelDto] = topUsersSortedByCount.map { user in
+            return convertRealmUserToTopVisitorsDto(user)
+        }
+
+        return topVisitorsArray
+    }
+
+    func calculateVisitorsByPeriod(_ statisticItems: Results<RLMStatisticItem>) -> VisitorsByPeriodsModelDto {
+        let filterFieldKey = RLMStatisticItem.keyTypeRawValue
+        let filterFieldValue = RLMStatisticItemType.view.rawValue
+        let visitItems = statisticItems.filter("\(filterFieldKey) == '\(filterFieldValue)'")
+
+        let allDates = visitItems.flatMap { $0.dates }
+        let result = calculateCounts(by: visitorsByPeriodFilter, from: Array(allDates))
+
+        return VisitorsByPeriodsModelDto(
+            countByPeriods: result,
+            period: visitorsByPeriodFilter
+        )
+    }
+
+
+    func countDatesEqualToDate(from dates: [Date], date: Date) -> Int {
+        let calendar = Calendar.current
+        return dates.filter {
+            calendar.isDate($0, equalTo: date, toGranularity: .day)
+        }.count
+    }
+
+    func calculateCounts(by period: VisitorsStatisticPeriod, from dates: [Date]) -> [CountByPeriodModelDto] {
+        let calendar = Calendar.current
+        var groupedDates: [CountByPeriodModelDto] = []
+
+        let sortedDates = dates.sorted { $0 > $1 }
+        let currentDate = Date()
+
+        for iPeriod in 0..<period.periodLength {
+            switch period {
+            case .byDay:
+                let periodDay = calendar.date(byAdding: .day, value: -iPeriod, to: currentDate)
+                guard let periodDay else { continue }
+
+                let count = countDatesEqualToDate(from: sortedDates, date: periodDay)
+
+                groupedDates.append(CountByPeriodModelDto(value: count, day: periodDay))
+
+
+
+            case .byWeek:
+                break
+//                let weekOfYear = calendar.component(.weekOfYear, from: date)
+//                let year = calendar.component(.year, from: date)
+//                key = "Week \(weekOfYear), \(year)" // Группировка по неделям
+
+            case .byMonth:
+                break
+//                let monthFormatter = DateFormatter()
+//                monthFormatter.dateFormat = "MMMM yyyy"
+//                key = monthFormatter.string(from: date) // Группировка по месяцам
+            }
+
+
+        }
+
+//        for date in dates {
+//            var key: String
+//
+//            switch period {
+//            case .byDay:
+//                key = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .none) // Группировка по дням
+//
+//            case .byWeek:
+//                let weekOfYear = calendar.component(.weekOfYear, from: date)
+//                let year = calendar.component(.year, from: date)
+//                key = "Week \(weekOfYear), \(year)" // Группировка по неделям
+//
+//            case .byMonth:
+//                let monthFormatter = DateFormatter()
+//                monthFormatter.dateFormat = "MMMM yyyy"
+//                key = monthFormatter.string(from: date) // Группировка по месяцам
+//            }
+//
+//            groupedDates[key, default: 0] += 1
+//        }
+
+        return groupedDates
+
+//        return [:]
+    }
 
     // MARK: - Add Users data to Realm
 
@@ -209,6 +347,19 @@ final class StatisticsModel {
         try realmManager.deleteAllObjects(withType: RLMStatisticItem.self)
         try realmManager.deleteAllObjects(withType: RLMUser.self)
         try realmManager.deleteAllObjects(withType: RLMFile.self)
+    }
+
+    // MARK: - Helpers
+
+    func convertRealmUserToTopVisitorsDto(_ user: RLMUser) -> TopVisitorModelDto {
+        return .init(
+            id: user.id,
+            avatarUrl: user.avatar?.url,
+            avatarData: nil,
+            username: user.username,
+            isOnline: user.isOnline,
+            age: user.age
+        )
     }
 
 }

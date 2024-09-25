@@ -13,6 +13,7 @@
 		3615FA872CA3411000D087A4 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 3615FA862CA3411000D087A4 /* RxSwift */; };
 		369439BD2CA1E0BC0095C7F5 /* .gitignore in Sources */ = {isa = PBXBuildFile; fileRef = 369439BC2CA1E0B70095C7F5 /* .gitignore */; };
 		36EAA4B82C99CCD800EBB0D4 /* PinLayout in Frameworks */ = {isa = PBXBuildFile; productRef = 36EAA4B72C99CCD800EBB0D4 /* PinLayout */; };
+		36EEB84E2CA38F24007CFCED /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 3615FA662CA2FFC000D087A4 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -22,6 +23,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				36EEB84E2CA38F24007CFCED /* RealmSwift in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;

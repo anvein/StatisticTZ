@@ -7,7 +7,7 @@ final class StatisticVisitorsTrendView: UIView {
     // MARK: - Subviews
 
     private let titleLabel: UILabel = {
-        $0.text = "Посетители" // TODO: lang
+        $0.text = "Посетители" 
         $0.font = .gilroyBold.withSize(20)
         $0.textColor = .black
         return $0
@@ -21,7 +21,7 @@ final class StatisticVisitorsTrendView: UIView {
 
     private let trendView: StatisticCommonTrendView = {
         $0.count = "-"
-        $0.text = "Количество посетителей в этом месяце неизвестно"
+        $0.text = "Количество посетителей в этом месяце ..."
         return $0
     }(StatisticCommonTrendView())
 
@@ -45,12 +45,14 @@ final class StatisticVisitorsTrendView: UIView {
     func fillVisitorsTrend(
         visitorsCountsByMonths: [Int],
         count: String,
-        trendType: StatisticCommonTrendView.TrendType,
+        trendType: StatisticLineSimpleTrendChartView.TrendType,
         text: String
     ) {
-        trendView.setChartData(countsByPeriods: visitorsCountsByMonths)
+        trendView.chartParams = (
+            countByPeriods: visitorsCountsByMonths,
+            trendType: trendType
+        )
         trendView.count = count
-        trendView.trendType = trendType
         trendView.text = text
     }
 

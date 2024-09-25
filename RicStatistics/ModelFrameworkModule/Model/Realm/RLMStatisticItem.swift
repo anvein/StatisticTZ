@@ -4,6 +4,10 @@ import RealmSwift
 
 class RLMStatisticItem: Object {
 
+    // MARK: - Fields names
+
+    static let keyTypeRawValue = "typeRawValue"
+
     // MARK: - Fields properties
 
     @Persisted(primaryKey: true) var id: String = UUID().uuidString

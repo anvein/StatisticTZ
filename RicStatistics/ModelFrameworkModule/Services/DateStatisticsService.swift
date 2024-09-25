@@ -12,7 +12,7 @@ final class DateStatisticsService {
 
     // MARK: - Methods
 
-    func calculateDatesCountByMonts(fromDates dates: [Date], countMonth: Int) -> [CountsByMonts] {
+    func calculateDatesCountByMonths(fromDates dates: [Date], countMonth: Int) -> [CountsByMonts] {
         let currentDate = Date()
         let calendar = Calendar.current
 
@@ -42,17 +42,14 @@ final class DateStatisticsService {
         return countByMonth
     }
 
-    func calculateDeltaForLastMonth(countsByMonths: [CountsByMonts]) -> Int? {
-        let lastMonthCount = countsByMonths[safe: 0]
-        let prevMonthCount = countsByMonths[safe: 1]
+    func calculateTrendTypeFor(_ countsByMonths: [Int]) -> TrendType? {
+        let lastMonthCount = countsByMonths.last
+        let prevMonthCount = countsByMonths[safe: countsByMonths.count - 2]
 
         guard let lastMonthCount, let prevMonthCount else { return nil }
 
-        return lastMonthCount.count - prevMonthCount.count
-    }
+        let delta = lastMonthCount - prevMonthCount
 
-    func calculateTrendTypeFor(delta: Int) -> TrendType {
-        var trendType: TrendType
         if delta > 0 {
             return .up
         } else if delta < 0 {

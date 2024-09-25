@@ -5,7 +5,7 @@ final class StatisticObserversTrendsView: UIView {
     // MARK: - Subviews
 
     private let titleLabel: UILabel = {
-        $0.text = "Наблюдатели" // TODO: lang
+        $0.text = "Наблюдатели"
         $0.font = .gilroyBold.withSize(20)
         $0.textColor = .Common.screenSectionTitle
         return $0
@@ -20,7 +20,7 @@ final class StatisticObserversTrendsView: UIView {
     private let newObserversView: StatisticCommonTrendView = {
         $0.trendType = .up
         $0.count = "-"
-        $0.text = "Новые наблюдатели в этом месяце" // TODO: lang
+        $0.text = "Новые наблюдатели в этом месяце"
         return $0
     }(StatisticCommonTrendView())
 
@@ -32,7 +32,7 @@ final class StatisticObserversTrendsView: UIView {
     private let lostObserversView: StatisticCommonTrendView = {
         $0.trendType = .down
         $0.count = "-"
-        $0.text = "Пользователей перестали за Вами наблюдать" // TODO: lang
+        $0.text = "Пользователей перестали за Вами наблюдать" 
         return $0
     }(StatisticCommonTrendView())
 
@@ -53,12 +53,18 @@ final class StatisticObserversTrendsView: UIView {
     // MARK: - Update view
 
     func fillNewObserversTrendView(countsByMonths: [Int], count: String) {
-        newObserversView.setChartData(countsByPeriods: countsByMonths)
+        newObserversView.chartParams = (
+            countByPeriods: countsByMonths,
+            trendType: .up
+        )
         newObserversView.count = count
     }
 
     func fillLostObserversTrendView(countsByMonths: [Int], count: String) {
-        lostObserversView.setChartData(countsByPeriods: countsByMonths)
+        lostObserversView.chartParams = (
+            countByPeriods: countsByMonths,
+            trendType: .down
+        )
         lostObserversView.count = count
     }
 

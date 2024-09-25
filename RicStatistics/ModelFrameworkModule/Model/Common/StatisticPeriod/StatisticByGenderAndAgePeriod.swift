@@ -13,7 +13,7 @@ enum StatisticByGenderAndAgePeriod: CaseIterable {
 extension StatisticByGenderAndAgePeriod: StatisticPeriod {
     var title: String {
         switch self {
-        case .today: return "Сегодня" // TODO: lang
+        case .today: return "Сегодня" 
         case .week: return "Неделя"
         case .month: return "Месяц"
         case .allTime: return "Все время"

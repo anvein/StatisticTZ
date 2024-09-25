@@ -4,11 +4,20 @@ import DGCharts
 
 final class StatisticCommonTrendView: UIView {
 
+    typealias ChartParams = (
+        countByPeriods: [Int],
+        trendType: StatisticLineSimpleTrendChartView.TrendType
+    )
+
     // MARK: - Subviews accessors
 
-    var countByPeriods: [Int] = [] {
+    var chartParams: ChartParams? = nil {
         didSet {
-            chartView.setDataAndReload(data: countByPeriods)
+            guard let chartParams else { return }
+            chartView.setDataAndReload(
+                data: chartParams.countByPeriods,
+                trendType: chartParams.trendType
+            )
         }
     }
 
@@ -78,10 +87,6 @@ final class StatisticCommonTrendView: UIView {
         calculateFramesOfSubviews()
     }
 
-    func setChartData(countsByPeriods: [Int]) {
-        chartView.setDataAndReload(data: countsByPeriods)
-    }
-
 }
 
 private extension StatisticCommonTrendView {
@@ -120,14 +125,4 @@ private extension StatisticCommonTrendView {
         self.pin.height(textLabel.frame.maxY)
     }
 
-}
-
-// MARK: - StatisticCommonTrendView.TrendType
-
-extension StatisticCommonTrendView {
-    enum TrendType {
-        case up
-        case down
-        case flat
-    }
 }

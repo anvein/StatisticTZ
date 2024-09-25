@@ -6,6 +6,8 @@ class StatisticViewController: UIViewController {
 
     let disposeBag = DisposeBag()
 
+    // MARK: - Data / State
+
     private var model: StatisticsModel
 
     // MARK: - Subviews
@@ -33,7 +35,8 @@ class StatisticViewController: UIViewController {
         super.viewDidLoad()
 
         setup()
-        setupBindings()
+        setupBindingsWithModel()
+        setupBindingsWithViews()
 
         Task { [model] in
             await model.loadData()
@@ -54,24 +57,35 @@ private extension StatisticViewController {
     // MARK: - Setup
 
     func setup() {
-        customView.addHandlerForRefreshControl(
-            target: self,
-            #selector(refreshControlValueDidChange(_:))
+        customView.refreshControl.addTarget(
+            self,
+            action: #selector(refreshControlValueDidChange(_:)),
+            for: .valueChanged
         )
+
+        customView.visitorsByPeriodView.setMenuPeriods(VisitorsStatisticPeriod.allCases)
+        customView.visitorsByPeriodView.selectMenuItem(with: model.visitorsByPeriodFilter)
     }
 
-    func setupBindings() {
-        model.topVisitorsObservable
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] users in
-                //
-            })
-            .disposed(by: disposeBag)
-
+    func setupBindingsWithModel() {
         model.isLoadingObservable
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] isLoading in
                 self?.customView.setIsLoadingRefreshControl(isLoading)
+            })
+            .disposed(by: disposeBag)
+
+        model.topVisitorsObservable
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] users in
+                self?.fillTopVisitorsView(users)
+            })
+            .disposed(by: disposeBag)
+
+        model.visitorsByPeriodsObservable
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] visitorsByPeriods in
+                self?.fillVisitorsByPeriodsView(visitorsByPeriods)
             })
             .disposed(by: disposeBag)
 
@@ -97,6 +111,17 @@ private extension StatisticViewController {
             .disposed(by: disposeBag)
     }
 
+    func setupBindingsWithViews() {
+        customView.visitorsByPeriodView.disSelectPeriodObservable
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [model] period in
+                guard let period else { return }
+                model.visitorsByPeriodFilter = period
+                model.reloadVisitorsByPeriodsData()
+            })
+            .disposed(by: disposeBag)
+    }
+
     // MARK: - Actions handlers
 
     @objc func refreshControlValueDidChange(_ refreshControl: UIRefreshControl) {
@@ -105,43 +130,49 @@ private extension StatisticViewController {
         }
     }
 
-    // MARK: - Helpers
-    // TODO: вынести в Presenter?
+}
 
-    func fillVisitorsTrendView(_ visitorsTrend: StatisticTrendModelDto) {
+private extension StatisticViewController {
+    // MARK: - Helpers
+    // TODO: вынести часть в сервис подготовки данных / Presenter
+
+    func fillVisitorsTrendView(_ visitorsTrend: VisitorsTrendModelDto) {
         let trendType = convertTrendModelTypeToViewType(visitorsTrend.trendType)
         let text = buildVisitorsTrendViewTextBy(visitorsTrend.trendType)
 
         customView.visitorsTrendView.fillVisitorsTrend(
-            visitorsCountsByMonths: visitorsTrend.countByPeriod.reversed(),
-            count: String(visitorsTrend.delta),
+            visitorsCountsByMonths: visitorsTrend.countByPeriods,
+            count: String(visitorsTrend.countInCurrentMonth),
             trendType: trendType,
             text: text
         )
     }
 
-    func fillNewObserversTrendView(_ trend: StatisticTrendModelDto) {
+    // TODO: преобразовать в DTO для view?
+    func fillTopVisitorsView(_ users: [TopVisitorModelDto]) {
+        customView.topVisitorsProfilesView.reloadTableWithData(users)
+    }
+
+    func fillNewObserversTrendView(_ trend: ObserversTrendModelDto) {
         customView.observersTrendsView.fillNewObserversTrendView(
-            countsByMonths: trend.countByPeriod.reversed(),
-            count: String(trend.delta)
+            countsByMonths: trend.countByPeriods,
+            count: String(trend.countInCurrentPeriod)
         )
     }
 
-    func fillLostObserversTrendView(_ trend: StatisticTrendModelDto) {
+    func fillLostObserversTrendView(_ trend: ObserversTrendModelDto) {
         customView.observersTrendsView.fillLostObserversTrendView(
-            countsByMonths: trend.countByPeriod.reversed(),
-            count: String(trend.delta)
+            countsByMonths: trend.countByPeriods,
+            count: String(trend.countInCurrentPeriod)
         )
     }
 
-    func convertTrendModelTypeToViewType(_ trendType: TrendType) -> StatisticCommonTrendView.TrendType {
+    func convertTrendModelTypeToViewType(_ trendType: TrendType) -> StatisticLineSimpleTrendChartView.TrendType {
         switch trendType {
-        case .up:
+        case .up, .flat:
             return .up
         case .down:
             return .down
-        case .flat:
-            return .flat
         }
     }
 
@@ -159,4 +190,40 @@ private extension StatisticViewController {
         return "Количество посетителей в этом месяце \(text)"
     }
 
+    func fillVisitorsByPeriodsView(_ visitorsByPeriods: VisitorsByPeriodsModelDto) {
+        // TODO: отрефакторить
+        var chartData: [StatisticByPeriodLineChart.ChartDataItem] = []
+        for visitorsByPeriod in visitorsByPeriods.countByPeriods {
+            switch visitorsByPeriods.period {
+            case .byDay:
+                var labelText = "-"
+                var tooltipText = "-"
+                if let dayDate = visitorsByPeriod.day {
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "dd.MM"
+                    labelText = dateFormatter.string(from: dayDate)
+
+                    dateFormatter.dateFormat = "d MMMM"
+                    dateFormatter.locale = .init(identifier: "ru_RU")
+                    tooltipText = dateFormatter.string(from: dayDate)
+                }
+
+                chartData.append((
+                    value: visitorsByPeriod.value,
+                    xAxisText: labelText,
+                    toolTipText: tooltipText
+                ))
+
+            case .byWeek:
+                break
+            case .byMonth:
+                break
+            }
+        }
+
+        customView.visitorsByPeriodView.setChartDataAndReload(
+            data: chartData.reversed(),
+            animate: true
+        )
+    }
 }

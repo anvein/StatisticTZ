@@ -5,7 +5,7 @@ import DGCharts
 
 class StatisticByPeriodLineChartTooltipView: MarkerView {
 
-    var dates = [Date]()
+    var dates: [String] = []
 
     // MARK: - Subviews
 
@@ -58,11 +58,8 @@ class StatisticByPeriodLineChartTooltipView: MarkerView {
         let numberPluralyze = number.pluralize(forms: ("посетитель", "посетителя", "посетителей"))
         textLabel.text = "\(number) \(numberPluralyze)"
 
-        if let date = dates[safe: Int(entry.x)] {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "d MMMM"
-            dateFormatter.locale = .init(identifier: "ru_RU")
-            dateLabel.text = dateFormatter.string(from: date)
+        if let dateAsString = dates[safe: Int(entry.x)] {
+            dateLabel.text = dateAsString
         }
 
         setNeedsLayout()

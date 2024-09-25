@@ -1,12 +1,18 @@
 
 import UIKit
+import RxSwift
 import DGCharts
 
-final class StatisticByPeriodView: UIView {
+final class StatisticVisitorsByPeriodView: UIView {
 
-    // MARK: - Model
+    // MARK: - Data / State
 
-    private let periodsArray: [VisitorsStatisticPeriod] = VisitorsStatisticPeriod.allCases
+    private var periodsArray: [VisitorsStatisticPeriod] = []
+
+    private let disSelectPeriodSubject = BehaviorSubject<VisitorsStatisticPeriod?>(value: nil)
+    var disSelectPeriodObservable: Observable<VisitorsStatisticPeriod?> {
+        return disSelectPeriodSubject.asObservable()
+    }
 
     // MARK: - Subviews
 
@@ -34,10 +40,29 @@ final class StatisticByPeriodView: UIView {
         calculateFramesOfSubviews()
     }
 
+    // MARK: - Update view
 
+    func setMenuPeriods(_ periods: [VisitorsStatisticPeriod]) {
+        periodsArray = periods
+        periodsMenuCollectionView.reloadData()
+    }
+
+    func selectMenuItem(with period: VisitorsStatisticPeriod) {
+        guard let indexPath = getIndexPath(for: period) else { return }
+
+        periodsMenuCollectionView.selectItem(
+            at: indexPath,
+            animated: false,
+            scrollPosition: .centeredHorizontally
+        )
+    }
+
+    func setChartDataAndReload(data: [StatisticByPeriodLineChart.ChartDataItem], animate: Bool) {
+        chartView.setDataAndReload(data: data, animate: animate)
+    }
 }
 
-private extension StatisticByPeriodView {
+private extension StatisticVisitorsByPeriodView {
 
     // MARK: - Setup
 
@@ -65,11 +90,16 @@ private extension StatisticByPeriodView {
     func getMenuItemFor(indexPath: IndexPath) -> VisitorsStatisticPeriod? {
         return periodsArray[safe: indexPath.item]
     }
+
+    func getIndexPath(for menuItem: VisitorsStatisticPeriod) -> IndexPath? {
+        guard let index = periodsArray.firstIndex(of: menuItem) else { return nil }
+        return IndexPath(row: index, section: 0)
+    }
 }
 
 // MARK: - UICollectionViewDataSource
 
-extension StatisticByPeriodView: UICollectionViewDataSource {
+extension StatisticVisitorsByPeriodView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return periodsArray.count
     }
@@ -89,7 +119,7 @@ extension StatisticByPeriodView: UICollectionViewDataSource {
 
 // MARK: - UICollectionViewDelegate
 
-extension StatisticByPeriodView: UICollectionViewDelegate {
+extension StatisticVisitorsByPeriodView: UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         if let cell = collectionView.cellForItem(at: indexPath),
@@ -99,26 +129,39 @@ extension StatisticByPeriodView: UICollectionViewDelegate {
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // TODO: перезагрузить график
-        ///
+        let period = getMenuItemFor(indexPath: indexPath)
+        guard let period, period != .byDay else {
+            disSelectPeriodSubject.onNext(period)
+            return
+        }
+
+        // TODO: удалить временное наполнение данных
+        ///////////////////////////////////////////////////////////////////////////
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-
-        var values: [Int] = []
-        for _ in 0...6 {
-            values.append(Int.random(in: 0...55))
-        }
 
         let dates = ["2024-03-05", "2024-03-06", "2024-03-07", "2024-03-08", "2024-03-09", "2024-03-10", "2024-03-11"].compactMap({
             return dateFormatter.date(from: $0)
         })
 
         var chartData = [StatisticByPeriodLineChart.ChartDataItem]()
-        for (value, date) in zip(values, dates) {
-            chartData.append((value: value, date: date))
+        for date in dates {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd.MM"
+            let labelText = dateFormatter.string(from: date)
+
+            dateFormatter.dateFormat = "d MMMM"
+            dateFormatter.locale = .init(identifier: "ru_RU")
+            let tooltipText = dateFormatter.string(from: date)
+
+            chartData.append((
+                value: Int.random(in: 0...55),
+                xAxisText: labelText,
+                toolTipText: tooltipText
+            ))
         }
 
         chartView.setDataAndReload(data: chartData, animate: true)
-        ///
+        ///////////////////////////////////////////////////////////////////////////
     }
 }

@@ -7,6 +7,7 @@ final class TopVisitorTableViewCell: UITableViewCell {
 
     private let avatarImageView: UIImageView = {
         $0.backgroundColor = .lightGray
+        $0.contentMode = .scaleAspectFill
         return $0
     }(UIImageView())
 
@@ -56,19 +57,21 @@ final class TopVisitorTableViewCell: UITableViewCell {
 
     // MARK: - Update view
 
-    func fillFrom(user: TopVisitorUserModel) {
+    func fillFrom(user: TopVisitorModelDto) {
         titleLabel.text = "\(user.username), \(user.age)"
         isOnlineView.isHidden = !user.isOnline
+
+        if let avatarUrl = user.avatarUrl {
+            setAvatarImage(avatarUrl: avatarUrl)
+        }
     }
 
     func setIsLast(_ isLast: Bool) {
         bottomSeparator.isHidden = isLast
     }
-
 }
 
 private extension TopVisitorTableViewCell {
-
     // MARK: - Setup
 
     func setup() {
@@ -114,6 +117,35 @@ private extension TopVisitorTableViewCell {
 
         avatarImageView.cornerRadius = avatarImageView.bounds.height / 2
         isOnlineView.cornerRadius = isOnlineView.frame.height / 2
+    }
+
+    func setAvatarImage(avatarUrl: String) {
+        // TODO: вынести скачивание в модель
+        guard let imageURL = URL(string: avatarUrl) else { return }
+
+        Task {
+            do {
+                if let image = try await downloadImage(from: imageURL) {
+                    Task { @MainActor [avatarImageView]  in
+                        avatarImageView.image = image
+                    }
+                }
+            } catch {
+                print("Ошибка при скачивании картинки: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    // TODO: вынести в NetworkService
+    private func downloadImage(from url: URL) async throws -> UIImage? {
+        let (data, response) = try await URLSession.shared.data(from: url)
+
+        guard let httpResponse = response as? HTTPURLResponse,
+                httpResponse.statusCode == 200 else {
+            return nil
+        }
+
+        return UIImage(data: data)
     }
 }
 

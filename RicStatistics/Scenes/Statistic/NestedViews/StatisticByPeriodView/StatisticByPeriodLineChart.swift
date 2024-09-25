@@ -5,7 +5,7 @@ import DGCharts
 
 final class StatisticByPeriodLineChart: LineChartView {
 
-    typealias ChartDataItem = (value: Int, date: Date)
+    typealias ChartDataItem = (value: Int, xAxisText: String, toolTipText: String)
 
     // MARK: - Data
 
@@ -22,23 +22,6 @@ final class StatisticByPeriodLineChart: LineChartView {
     convenience init() {
         self.init(frame: .zero)
         setup()
-
-        // TODO: временная генерация данных
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-
-        let values = [0, 3, 5, 2, 1, 15, 2]
-        let dates = ["2024-03-05", "2024-03-06", "2024-03-07", "2024-03-08", "2024-03-09", "2024-03-10", "2024-03-11"].compactMap({
-            return dateFormatter.date(from: $0)
-        })
-
-        var chartData = [ChartDataItem]()
-        for (value, date) in zip(values, dates) {
-            chartData.append((value: value, date: date))
-        }
-
-        setDataAndReload(data:chartData, animate: false)
-        ///
     }
 
     // MARK: - Update view (internal)
@@ -55,10 +38,17 @@ private extension StatisticByPeriodLineChart {
     // MARK: - Setup
 
     func setup() {
+        noDataText = "Нет данных"
+        noDataFont = .gilroyMedium.withSize(14)
+
         backgroundColor = .Common.screenSectionBg
         cornerRadius = 16
 
-        setScaleEnabled(false)
+        scaleYEnabled = false
+        scaleXEnabled = true
+
+        dragYEnabled = false
+        dragXEnabled = true
 
         chartDescription.enabled = false
         legend.enabled = false
@@ -83,11 +73,9 @@ private extension StatisticByPeriodLineChart {
 
         setExtraOffsets(left: 14, top: 29, right: 14, bottom: 10)
 
-        dragYEnabled = false
-        dragXEnabled = true
-
         tooltipChart.chartView = self
         marker = tooltipChart
+        highlightPerDragEnabled = false
     }
 
     // MARK: - Update view (private)
@@ -104,7 +92,7 @@ private extension StatisticByPeriodLineChart {
 
         self.data = data
 
-        setupXAxisLabels()
+        setupXAxisLabels(entries)
         setupToolTip()
 
         if withAnimate {
@@ -169,19 +157,24 @@ private extension StatisticByPeriodLineChart {
         return line
     }
 
-    func setupXAxisLabels() {
-        let dates = chartData.map { $0.date }
+    func setupXAxisLabels(_ entries: [ChartDataEntry]) {
+        let texts = chartData.map { $0.xAxisText }
+        xAxis.valueFormatter = CustomLabelsXAxisFormatter(labelsTexts: texts)
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd.MM"
-        xAxis.valueFormatter = DatesXAxisFormatter(
-            dates: dates,
-            dateFormatter: dateFormatter
-        )
+        if !entries.isEmpty {
+            setVisibleXRange(
+                minXRange: Double(min(chartData.count, 7)),
+                maxXRange: 10.0
+            )
+
+            if let lastXValue = entries.last?.x {
+                moveViewToX(Double(lastXValue))
+            }
+        }
     }
 
     func setupToolTip() {
-        let dates = chartData.map { $0.date }
+        let dates = chartData.map { $0.toolTipText }
         tooltipChart.dates = dates
     }
 

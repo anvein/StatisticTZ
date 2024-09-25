@@ -8,18 +8,14 @@ final class StatisticTopVisitorsProfilesView: UIView {
 
     private static let maxUsersInTable = 3
 
-    // MARK: - Model
+    // MARK: - Data
 
-    var usersArray: [TopVisitorUserModel] = [
-        .init(avatar: .userAvatar, isOnline: true, age: 25, username: "ann.aeom"),
-        .init(avatar: .userAvatar, isOnline: false, age: 23, username: "akimovahuiw"),
-        .init(avatar: .userAvatar, isOnline: true, age: 32, username: "gulia.filova sdkfjdksla jf;ldskljfsadklj "),
-    ]
+    private var topVisitorsArray: [TopVisitorModelDto] = []
 
     // MARK: - Subviews
 
     private let titleLabel: UILabel = {
-        $0.text = "Чаще всех посещают Ваш профиль" // TODO: lang
+        $0.text = "Чаще всех посещают Ваш профиль" 
         $0.font = .gilroyBold.withSize(20)
         $0.setKern(-0.1)
         $0.textColor = .black
@@ -52,6 +48,12 @@ final class StatisticTopVisitorsProfilesView: UIView {
         calculateFramesOfSubviews()
     }
 
+    // MARK: - Update view
+
+    func reloadTableWithData(_ topVisitorsArray: [TopVisitorModelDto]) {
+        self.topVisitorsArray = topVisitorsArray
+        usersTableView.reloadData()
+    }
 
 }
 
@@ -80,8 +82,8 @@ private extension StatisticTopVisitorsProfilesView {
 
     // MARK: - Helpers
 
-    func getUserBy(indexPath: IndexPath) -> TopVisitorUserModel? {
-        return usersArray[safe: indexPath.row]
+    func getUserBy(indexPath: IndexPath) -> TopVisitorModelDto? {
+        return topVisitorsArray[safe: indexPath.row]
     }
 
 }
@@ -90,7 +92,7 @@ private extension StatisticTopVisitorsProfilesView {
 
 extension StatisticTopVisitorsProfilesView: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return min(usersArray.count, Self.maxUsersInTable)
+        return min(topVisitorsArray.count, Self.maxUsersInTable)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -98,7 +100,7 @@ extension StatisticTopVisitorsProfilesView: UITableViewDataSource {
 
         if let user = getUserBy(indexPath: indexPath) {
             cell.fillFrom(user: user)
-            cell.setIsLast(indexPath.row == min(usersArray.count, Self.maxUsersInTable))
+            cell.setIsLast(indexPath.row == min(topVisitorsArray.count, Self.maxUsersInTable))
         }
 
         return cell

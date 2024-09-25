@@ -6,7 +6,7 @@ final class StatisticCustomView: UIView {
 
     // MARK: - Subviews
 
-    private lazy var refreshControl: UIRefreshControl = {
+    lazy var refreshControl: UIRefreshControl = {
         return $0
     }(UIRefreshControl())
 
@@ -27,7 +27,7 @@ final class StatisticCustomView: UIView {
     private let contentContainerView: UIView = .init()
 
     private let titleLabel: UILabel = {
-        $0.text = "Статистика" // TODO: lang
+        $0.text = "Статистика"
         $0.textColor = .black
         $0.font = .gilroyBold.withSize(32)
         $0.numberOfLines = 0
@@ -36,8 +36,8 @@ final class StatisticCustomView: UIView {
     }(UILabel())
 
     let visitorsTrendView: StatisticVisitorsTrendView = .init()
-    private let byPeriodView: StatisticByPeriodView = .init()
-    private let topVisitorsProfilesView: StatisticTopVisitorsProfilesView = .init()
+    let visitorsByPeriodView: StatisticVisitorsByPeriodView = .init()
+    let topVisitorsProfilesView: StatisticTopVisitorsProfilesView = .init()
     private let byGenderAndAgeView: StatisticByGenderAndAgeView = .init()
     let observersTrendsView: StatisticObserversTrendsView = .init()
 
@@ -54,12 +54,6 @@ final class StatisticCustomView: UIView {
         super.layoutSubviews()
 
         calculateFramesOfSubviews()
-    }
-
-    // MARK: - Setup (internal)
-
-    func addHandlerForRefreshControl(target: Any, _ action: Selector) {
-        refreshControl.addTarget(target, action: action, for: .valueChanged)
     }
 
     // MARK: - Update view
@@ -85,7 +79,7 @@ private extension StatisticCustomView {
         contentContainerView.addSubviews(
             titleLabel,
             visitorsTrendView,
-            byPeriodView,
+            visitorsByPeriodView,
             topVisitorsProfilesView,
             byGenderAndAgeView,
             observersTrendsView
@@ -109,13 +103,13 @@ private extension StatisticCustomView {
             .marginTop(38)
             .horizontally(16)
 
-        byPeriodView.pin
+        visitorsByPeriodView.pin
             .below(of: visitorsTrendView)
             .marginTop(28)
             .horizontally()
 
         topVisitorsProfilesView.pin
-            .below(of: byPeriodView)
+            .below(of: visitorsByPeriodView)
             .marginTop(32)
             .horizontally(16)
 

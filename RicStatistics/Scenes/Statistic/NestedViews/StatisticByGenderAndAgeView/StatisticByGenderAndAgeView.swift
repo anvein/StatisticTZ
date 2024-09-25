@@ -10,7 +10,7 @@ final class StatisticByGenderAndAgeView: UIView {
     // MARK: - Subviews
 
     private let titleLabel: UILabel = {
-        $0.text = "Пол и возраст" // TODO: lang
+        $0.text = "Пол и возраст" 
         $0.font = .gilroyBold.withSize(20)
         $0.setKern(-0.1)
         $0.textColor = .black

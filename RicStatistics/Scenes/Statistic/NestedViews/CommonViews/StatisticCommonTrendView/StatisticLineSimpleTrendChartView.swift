@@ -7,6 +7,7 @@ final class StatisticLineSimpleTrendChartView: LineChartView {
     // MARK: - Data
 
     private var chartData: [Int] = []
+    private var trendType: TrendType = .up
 
     // MARK: - Init
 
@@ -17,8 +18,9 @@ final class StatisticLineSimpleTrendChartView: LineChartView {
 
     // MARK: - Update view (internal)
 
-    func setDataAndReload(data: [Int]) {
+    func setDataAndReload(data: [Int], trendType: TrendType) {
         chartData = data
+        self.trendType = trendType
         reloadChart()
     }
 
@@ -52,7 +54,6 @@ private extension StatisticLineSimpleTrendChartView {
 
     func reloadChart() {
         let entries = buildChartDataEntry()
-        let trendType = calculateTrendType()
 
         let shadowLineDataSet = buildShadowLineDataSetFrom(entries)
         let mainLineDataSet = buildMainLineDataSetFrom(entries, trendType: trendType)
@@ -88,16 +89,6 @@ private extension StatisticLineSimpleTrendChartView {
         return lastPointChartEntry
     }
 
-    func calculateTrendType() -> StatisticChartTrendType {
-        var trendType: StatisticChartTrendType = .up
-        if let currentValue = chartData.last,
-           let previousValue = chartData[safe: chartData.count - 2] {
-            trendType = currentValue > previousValue ? .up : .down
-        }
-
-        return trendType
-    }
-
     func buildShadowLineDataSetFrom(_ entries: [ChartDataEntry]) -> LineChartDataSet {
         let lineDataSet = LineChartDataSet(entries: entries)
         lineDataSet.colors = [.Charts.shadowLine]
@@ -113,7 +104,7 @@ private extension StatisticLineSimpleTrendChartView {
 
     func buildMainLineDataSetFrom(
         _ entries: [ChartDataEntry],
-        trendType: StatisticChartTrendType
+        trendType: TrendType
     ) -> LineChartDataSet {
         let lineDataSet = LineChartDataSet(entries: entries)
 
@@ -122,7 +113,6 @@ private extension StatisticLineSimpleTrendChartView {
         lineDataSet.drawValuesEnabled = false
         lineDataSet.lineWidth = 3
         lineDataSet.mode = .cubicBezier
-        lineDataSet.cubicIntensity = 0.25
         lineDataSet.lineCapType = .round
         lineDataSet.drawHorizontalHighlightIndicatorEnabled = false
 
@@ -131,7 +121,7 @@ private extension StatisticLineSimpleTrendChartView {
 
     func buildLastPointLineDataSetFrom(
         _ entries: [ChartDataEntry],
-        trendType: StatisticChartTrendType
+        trendType: TrendType
     ) -> LineChartDataSet {
         let lineDataSet = LineChartDataSet(entries: entries)
         lineDataSet.drawValuesEnabled = false
@@ -142,4 +132,20 @@ private extension StatisticLineSimpleTrendChartView {
         return lineDataSet
     }
 
+}
+
+// MARK: - StatisticLineSimpleTrendChartView.TrendType
+
+extension StatisticLineSimpleTrendChartView {
+    enum TrendType {
+        case up
+        case down
+
+        var color: UIColor {
+            switch self {
+            case .up: return .Charts.green
+            case .down: return .Charts.red
+            }
+        }
+    }
 }
